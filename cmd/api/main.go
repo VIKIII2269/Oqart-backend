@@ -11,8 +11,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/oqart/backend/config"
+	"github.com/oqart/backend/internal/delivery/http/handler"
+	"github.com/oqart/backend/internal/delivery/http/middleware"
+	"github.com/oqart/backend/internal/repository/postgres"
+	"github.com/oqart/backend/internal/usecase"
 	"github.com/oqart/backend/pkg/cache"
 	"github.com/oqart/backend/pkg/database"
+	"github.com/oqart/backend/pkg/jwt"
 	"github.com/oqart/backend/pkg/logger"
 )
 
@@ -63,7 +68,8 @@ func main() {
 	log.Info("Database connection established")
 
 	// Initialize Redis
-	redisCache, err := cache.NewRedis(&cfg.Redis, log)
+	var redisCache *cache.Cache
+	redisCache, err = cache.NewRedis(&cfg.Redis, log)
 	if err != nil {
 		log.Warn("Failed to connect to Redis, continuing without cache", err)
 		redisCache = nil
@@ -71,6 +77,33 @@ func main() {
 		defer redisCache.Close()
 		log.Info("Redis connection established")
 	}
+
+	// Initialize JWT manager
+	jwtManager := jwt.NewTokenManager(&cfg.JWT)
+
+	// Initialize repositories
+	userRepo := postgres.NewUserRepository(db.DB)
+	sessionRepo := postgres.NewSessionRepository(db.DB)
+	otpRepo := postgres.NewOTPRepository(db.DB)
+	passwordResetRepo := postgres.NewPasswordResetRepository(db.DB)
+
+	// Initialize use cases
+	authUseCase := usecase.NewAuthUseCase(
+		userRepo,
+		sessionRepo,
+		otpRepo,
+		passwordResetRepo,
+		jwtManager,
+		redisCache,
+		cfg,
+		log,
+	)
+
+	// Initialize handlers
+	authHandler := handler.NewAuthHandler(authUseCase, log)
+
+	// Initialize middleware
+	authMiddleware := middleware.NewAuthMiddleware(jwtManager, userRepo)
 
 	// Set Gin mode
 	if cfg.IsProduction() {
@@ -91,7 +124,7 @@ func main() {
 	// API v1 routes
 	v1 := router.Group("/api/v1")
 	{
-		// Placeholder routes - to be implemented
+		// Public routes
 		v1.GET("/ping", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"message": "pong",
@@ -100,14 +133,80 @@ func main() {
 			})
 		})
 
-		// TODO: Add route groups:
-		// - auth := v1.Group("/auth")
-		// - users := v1.Group("/users")
-		// - products := v1.Group("/products")
-		// - orders := v1.Group("/orders")
-		// - vendors := v1.Group("/vendors")
-		// - admin := v1.Group("/admin")
-		// etc.
+		// Authentication routes (public)
+		auth := v1.Group("/auth")
+		{
+			auth.POST("/register", authHandler.Register)
+			auth.POST("/login", authHandler.Login)
+			auth.POST("/login/phone", authHandler.SendPhoneOTP)
+			auth.POST("/verify-otp", authHandler.VerifyPhoneOTP)
+			auth.POST("/refresh-token", authHandler.RefreshToken)
+			auth.POST("/forgot-password", authHandler.ForgotPassword)
+			auth.POST("/reset-password", authHandler.ResetPassword)
+			auth.GET("/verify-email", authHandler.VerifyEmail)
+
+			// Protected auth routes
+			authProtected := auth.Group("")
+			authProtected.Use(authMiddleware.RequireAuth())
+			{
+				authProtected.POST("/logout", authHandler.Logout)
+			}
+		}
+
+		// User routes (protected)
+		users := v1.Group("/users")
+		users.Use(authMiddleware.RequireAuth())
+		{
+			// TODO: Add user management endpoints
+			// users.GET("/me", userHandler.GetMe)
+			// users.PUT("/me", userHandler.UpdateMe)
+			// users.PUT("/me/password", userHandler.ChangePassword)
+			// users.PUT("/me/email", userHandler.UpdateEmail)
+			// users.PUT("/me/phone", userHandler.UpdatePhone)
+			// users.DELETE("/me", userHandler.DeleteAccount)
+			// users.GET("/me/preferences", userHandler.GetPreferences)
+			// users.PUT("/me/preferences", userHandler.UpdatePreferences)
+		}
+
+		// Vendor routes
+		vendors := v1.Group("/vendors")
+		{
+			// TODO: Add vendor endpoints
+			// vendors.POST("/onboard/step1", vendorHandler.OnboardStep1)
+			// vendors.POST("/verify-gstin", vendorHandler.VerifyGSTIN)
+			// etc.
+		}
+
+		// Product routes
+		products := v1.Group("/products")
+		{
+			// TODO: Add product endpoints
+			// products.GET("", productHandler.List)
+			// products.GET("/:slug", productHandler.GetBySlug)
+			// etc.
+		}
+
+		// Cart routes
+		cart := v1.Group("/cart")
+		cart.Use(authMiddleware.RequireAuth())
+		{
+			// TODO: Add cart endpoints
+		}
+
+		// Order routes
+		orders := v1.Group("/orders")
+		orders.Use(authMiddleware.RequireAuth())
+		{
+			// TODO: Add order endpoints
+		}
+
+		// Admin routes
+		admin := v1.Group("/admin")
+		admin.Use(authMiddleware.RequireAuth())
+		admin.Use(authMiddleware.RequireAdmin())
+		{
+			// TODO: Add admin endpoints
+		}
 	}
 
 	// Create HTTP server
