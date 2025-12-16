@@ -2,49 +2,6 @@ package dto
 
 import "time"
 
-// UserResponse represents the user profile response
-type UserResponse struct {
-	ID            string     `json:"id"`
-	Email         string     `json:"email"`
-	Phone         *string    `json:"phone,omitempty"`
-	FirstName     string     `json:"first_name"`
-	LastName      string     `json:"last_name"`
-	Role          string     `json:"role"`
-	Status        string     `json:"status"`
-	EmailVerified bool       `json:"email_verified"`
-	PhoneVerified bool       `json:"phone_verified"`
-	Avatar        *string    `json:"avatar,omitempty"`
-	CreatedAt     time.Time  `json:"created_at"`
-	UpdatedAt     time.Time  `json:"updated_at"`
-	LastLoginAt   *time.Time `json:"last_login_at,omitempty"`
-}
-
-// UpdateProfileRequest represents profile update request
-type UpdateProfileRequest struct {
-	FirstName string  `json:"first_name" validate:"required,min=2,max=50"`
-	LastName  string  `json:"last_name" validate:"required,min=2,max=50"`
-	Phone     *string `json:"phone,omitempty" validate:"omitempty,indian_phone"`
-	Avatar    *string `json:"avatar,omitempty" validate:"omitempty,url"`
-}
-
-// ChangePasswordRequest represents password change request
-type ChangePasswordRequest struct {
-	CurrentPassword string `json:"current_password" validate:"required"`
-	NewPassword     string `json:"new_password" validate:"required,strong_password"`
-}
-
-// UpdateEmailRequest represents email update request
-type UpdateEmailRequest struct {
-	NewEmail string `json:"new_email" validate:"required,email"`
-	Password string `json:"password" validate:"required"`
-}
-
-// UpdatePhoneRequest represents phone update request
-type UpdatePhoneRequest struct {
-	NewPhone string `json:"new_phone" validate:"required,indian_phone"`
-	Password string `json:"password" validate:"required"`
-}
-
 // PreferencesResponse represents user preferences
 type PreferencesResponse struct {
 	UserID                string    `json:"user_id"`

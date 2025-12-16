@@ -24,6 +24,160 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/admin/vendors/documents/{id}/verify": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Admin endpoint to verify or reject a vendor's uploaded document",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Vendor Management"
+                ],
+                "summary": "Verify or reject vendor document (Admin only)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Document ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Verification decision",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.AdminDocumentVerificationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Document verified successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or validation error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Admin access required",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Document not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/vendors/{id}/approve": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Admin endpoint to approve, reject, or suspend a vendor",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Vendor Management"
+                ],
+                "summary": "Approve or reject vendor (Admin only)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Vendor ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Approval decision",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.AdminVendorApprovalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Vendor status updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or validation error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Admin access required",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Vendor not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/forgot-password": {
             "post": {
                 "description": "Send password reset link to email",
@@ -1170,6 +1324,539 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/vendors": {
+            "get": {
+                "description": "Get a paginated list of vendors with optional filters",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vendors"
+                ],
+                "summary": "List vendors",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number (default: 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size (default: 20, max: 100)",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status (pending, under_review, approved, rejected, suspended, inactive)",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by verification status",
+                        "name": "is_verified",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by featured status",
+                        "name": "is_featured",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search by business name or description",
+                        "name": "search",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/vendors/me": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get the authenticated vendor's complete profile with all details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vendor Management"
+                ],
+                "summary": "Get vendor dashboard",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorDetailedResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Vendor not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update the authenticated vendor's profile information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vendor Management"
+                ],
+                "summary": "Update vendor profile",
+                "parameters": [
+                    {
+                        "description": "Profile update data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.UpdateVendorProfileRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or validation error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Vendor not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/vendors/me/documents": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all documents uploaded by the authenticated vendor",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vendor Management"
+                ],
+                "summary": "Get vendor documents",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorDocumentResponse"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Vendor not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/vendors/onboard/step1": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Complete the first step of vendor onboarding by providing business details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vendor Onboarding"
+                ],
+                "summary": "Vendor onboarding - Step 1 (Business Details)",
+                "parameters": [
+                    {
+                        "description": "Business details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorOnboardingStep1Request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or validation error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Vendor already exists",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/vendors/onboard/step2": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Complete the second step of vendor onboarding by providing business address",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vendor Onboarding"
+                ],
+                "summary": "Vendor onboarding - Step 2 (Business Address)",
+                "parameters": [
+                    {
+                        "description": "Business address",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorOnboardingStep2Request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorAddressResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or validation error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Vendor not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/vendors/onboard/step3": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Complete the third step of vendor onboarding by providing bank details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vendor Onboarding"
+                ],
+                "summary": "Vendor onboarding - Step 3 (Bank Details)",
+                "parameters": [
+                    {
+                        "description": "Bank details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorOnboardingStep3Request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorBankDetailsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or validation error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Vendor not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/vendors/onboard/step4": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Complete the final step of vendor onboarding by providing contact person details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vendor Onboarding"
+                ],
+                "summary": "Vendor onboarding - Step 4 (Contact Person)",
+                "parameters": [
+                    {
+                        "description": "Contact person details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorOnboardingStep4Request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorContactPersonResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or validation error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Vendor not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/vendors/{id}": {
+            "get": {
+                "description": "Get public vendor profile by vendor ID (only approved vendors)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vendors"
+                ],
+                "summary": "Get vendor by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Vendor ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid vendor ID",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Vendor not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1223,6 +1910,43 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "string"
+                }
+            }
+        },
+        "github_com_oqart_backend_internal_delivery_http_dto.AdminDocumentVerificationRequest": {
+            "type": "object",
+            "required": [
+                "status"
+            ],
+            "properties": {
+                "rejection_reason": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "approved",
+                        "rejected"
+                    ]
+                }
+            }
+        },
+        "github_com_oqart_backend_internal_delivery_http_dto.AdminVendorApprovalRequest": {
+            "type": "object",
+            "required": [
+                "status"
+            ],
+            "properties": {
+                "rejection_reason": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "approved",
+                        "rejected",
+                        "suspended"
+                    ]
                 }
             }
         },
@@ -1625,6 +2349,26 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_oqart_backend_internal_delivery_http_dto.UpdateVendorProfileRequest": {
+            "type": "object",
+            "properties": {
+                "banner_url": {
+                    "type": "string"
+                },
+                "business_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "minLength": 3
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 1000
+                },
+                "logo_url": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_oqart_backend_internal_delivery_http_dto.UserResponse": {
             "type": "object",
             "properties": {
@@ -1665,6 +2409,430 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_oqart_backend_internal_delivery_http_dto.VendorAddressResponse": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_primary": {
+                    "type": "boolean"
+                },
+                "landmark": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "pincode": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "street_address": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "vendor_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_oqart_backend_internal_delivery_http_dto.VendorBankDetailsResponse": {
+            "type": "object",
+            "properties": {
+                "account_holder_name": {
+                    "type": "string"
+                },
+                "account_number_masked": {
+                    "description": "Masked for security",
+                    "type": "string"
+                },
+                "account_type": {
+                    "type": "string"
+                },
+                "bank_name": {
+                    "type": "string"
+                },
+                "branch_name": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "ifsc_code": {
+                    "type": "string"
+                },
+                "is_verified": {
+                    "type": "boolean"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "vendor_id": {
+                    "type": "string"
+                },
+                "verified_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_oqart_backend_internal_delivery_http_dto.VendorContactPersonResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "designation": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_primary": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "vendor_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_oqart_backend_internal_delivery_http_dto.VendorDetailedResponse": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorAddressResponse"
+                },
+                "bank_details": {
+                    "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorBankDetailsResponse"
+                },
+                "contact_person": {
+                    "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorContactPersonResponse"
+                },
+                "documents": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorDocumentResponse"
+                    }
+                },
+                "vendor": {
+                    "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorResponse"
+                }
+            }
+        },
+        "github_com_oqart_backend_internal_delivery_http_dto.VendorDocumentResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "file_name": {
+                    "type": "string"
+                },
+                "file_size": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "rejection_reason": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "vendor_id": {
+                    "type": "string"
+                },
+                "verified_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_oqart_backend_internal_delivery_http_dto.VendorListResponse": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                },
+                "vendors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorResponse"
+                    }
+                }
+            }
+        },
+        "github_com_oqart_backend_internal_delivery_http_dto.VendorOnboardingStep1Request": {
+            "type": "object",
+            "required": [
+                "business_name",
+                "business_type"
+            ],
+            "properties": {
+                "business_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "minLength": 3
+                },
+                "business_type": {
+                    "type": "string",
+                    "enum": [
+                        "individual",
+                        "proprietorship",
+                        "partnership",
+                        "private_limited",
+                        "public_limited",
+                        "llp"
+                    ]
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 1000
+                },
+                "fssai_number": {
+                    "type": "string"
+                },
+                "gstin": {
+                    "type": "string"
+                },
+                "pan": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_oqart_backend_internal_delivery_http_dto.VendorOnboardingStep2Request": {
+            "type": "object",
+            "required": [
+                "city",
+                "country",
+                "pincode",
+                "state",
+                "street_address"
+            ],
+            "properties": {
+                "city": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 2
+                },
+                "country": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 2
+                },
+                "landmark": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "pincode": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 2
+                },
+                "street_address": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "minLength": 5
+                }
+            }
+        },
+        "github_com_oqart_backend_internal_delivery_http_dto.VendorOnboardingStep3Request": {
+            "type": "object",
+            "required": [
+                "account_holder_name",
+                "account_number",
+                "account_type",
+                "bank_name",
+                "ifsc_code"
+            ],
+            "properties": {
+                "account_holder_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "minLength": 3
+                },
+                "account_number": {
+                    "type": "string",
+                    "maxLength": 18,
+                    "minLength": 9
+                },
+                "account_type": {
+                    "type": "string",
+                    "enum": [
+                        "savings",
+                        "current"
+                    ]
+                },
+                "bank_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "minLength": 2
+                },
+                "branch_name": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "ifsc_code": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_oqart_backend_internal_delivery_http_dto.VendorOnboardingStep4Request": {
+            "type": "object",
+            "required": [
+                "name",
+                "phone"
+            ],
+            "properties": {
+                "designation": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "minLength": 3
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_oqart_backend_internal_delivery_http_dto.VendorResponse": {
+            "type": "object",
+            "properties": {
+                "approved_at": {
+                    "type": "string"
+                },
+                "banner_url": {
+                    "type": "string"
+                },
+                "business_name": {
+                    "type": "string"
+                },
+                "business_type": {
+                    "type": "string"
+                },
+                "commission_rate": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "fssai_number": {
+                    "type": "string"
+                },
+                "gstin": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_featured": {
+                    "type": "boolean"
+                },
+                "is_verified": {
+                    "type": "boolean"
+                },
+                "logo_url": {
+                    "type": "string"
+                },
+                "onboarding_step": {
+                    "type": "integer"
+                },
+                "pan": {
+                    "type": "string"
+                },
+                "rating": {
+                    "type": "number"
+                },
+                "rejection_reason": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "total_orders": {
+                    "type": "integer"
+                },
+                "total_reviews": {
+                    "type": "integer"
+                },
+                "total_sales": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
                     "type": "string"
                 }
             }

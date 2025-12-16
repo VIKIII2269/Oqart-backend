@@ -190,9 +190,10 @@ func (uc *authUseCase) SendPhoneOTP(ctx context.Context, req *dto.PhoneLoginRequ
 	// Check rate limiting
 	cacheKey := fmt.Sprintf("otp:rate_limit:%s", sanitizedPhone)
 	if uc.cache != nil {
-		count, err := uc.cache.Get(ctx, cacheKey, new(int))
-		if err == nil && count != nil {
-			if *count.(*int) >= 5 {
+		var count int
+		err := uc.cache.Get(ctx, cacheKey, &count)
+		if err == nil {
+			if count >= 5 {
 				return nil, apperrors.New("RATE_LIMIT", "Too many OTP requests. Please try again later.", 429)
 			}
 		}

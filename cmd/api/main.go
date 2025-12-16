@@ -91,6 +91,7 @@ func main() {
 	otpRepo := postgres.NewOTPRepository(db.DB)
 	passwordResetRepo := postgres.NewPasswordResetRepository(db.DB)
 	addressRepo := postgres.NewAddressRepository(db.DB)
+	vendorRepo := postgres.NewVendorRepository(db.DB)
 
 	// Initialize use cases
 	authUseCase := usecase.NewAuthUseCase(
@@ -109,10 +110,17 @@ func main() {
 		redisCache,
 		log,
 	)
+	vendorUseCase := usecase.NewVendorUseCase(
+		vendorRepo,
+		userRepo,
+		redisCache,
+		log,
+	)
 
 	// Initialize handlers
 	authHandler := handler.NewAuthHandler(authUseCase, log)
 	userHandler := handler.NewUserHandler(userUseCase, log)
+	vendorHandler := handler.NewVendorHandler(vendorUseCase, log)
 
 	// Initialize middleware
 	authMiddleware := middleware.NewAuthMiddleware(jwtManager, userRepo)
@@ -198,10 +206,25 @@ func main() {
 		// Vendor routes
 		vendors := v1.Group("/vendors")
 		{
-			// TODO: Add vendor endpoints
-			// vendors.POST("/onboard/step1", vendorHandler.OnboardStep1)
-			// vendors.POST("/verify-gstin", vendorHandler.VerifyGSTIN)
-			// etc.
+			// Public vendor routes
+			vendors.GET("", vendorHandler.ListVendors)
+			vendors.GET("/:id", vendorHandler.GetVendorByID)
+
+			// Protected vendor routes
+			vendorProtected := vendors.Group("")
+			vendorProtected.Use(authMiddleware.RequireAuth())
+			{
+				// Vendor onboarding
+				vendorProtected.POST("/onboard/step1", vendorHandler.OnboardStep1)
+				vendorProtected.POST("/onboard/step2", vendorHandler.OnboardStep2)
+				vendorProtected.POST("/onboard/step3", vendorHandler.OnboardStep3)
+				vendorProtected.POST("/onboard/step4", vendorHandler.OnboardStep4)
+
+				// Vendor dashboard
+				vendorProtected.GET("/me", vendorHandler.GetMyVendor)
+				vendorProtected.PUT("/me", vendorHandler.UpdateProfile)
+				vendorProtected.GET("/me/documents", vendorHandler.GetDocuments)
+			}
 		}
 
 		// Product routes
@@ -232,7 +255,11 @@ func main() {
 		admin.Use(authMiddleware.RequireAuth())
 		admin.Use(authMiddleware.RequireAdmin())
 		{
-			// TODO: Add admin endpoints
+			// Vendor management
+			admin.POST("/vendors/:id/approve", vendorHandler.ApproveVendor)
+			admin.PUT("/vendors/documents/:id/verify", vendorHandler.VerifyDocument)
+
+			// TODO: Add more admin endpoints
 		}
 	}
 

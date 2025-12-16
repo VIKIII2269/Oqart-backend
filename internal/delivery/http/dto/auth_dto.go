@@ -116,18 +116,22 @@ func ToUserResponse(user *domain.User) *UserResponse {
 type UpdateProfileRequest struct {
 	FirstName   *string    `json:"first_name" validate:"omitempty,min=2,max=100"`
 	LastName    *string    `json:"last_name" validate:"omitempty,max=100"`
+	Phone       *string    `json:"phone,omitempty" validate:"omitempty,indian_phone"`
+	Avatar      *string    `json:"avatar,omitempty" validate:"omitempty,url"`
 	DateOfBirth *time.Time `json:"date_of_birth" validate:"omitempty"`
 	Gender      *string    `json:"gender" validate:"omitempty,oneof=male female other"`
 }
 
 // Update Email Request
 type UpdateEmailRequest struct {
-	Email string `json:"email" validate:"required,email"`
+	NewEmail string `json:"new_email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
 }
 
 // Update Phone Request
 type UpdatePhoneRequest struct {
-	Phone string `json:"phone" validate:"required,phone"`
+	NewPhone string `json:"new_phone" validate:"required,indian_phone"`
+	Password string `json:"password" validate:"required"`
 }
 
 // OTP Response

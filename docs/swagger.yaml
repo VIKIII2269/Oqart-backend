@@ -35,6 +35,31 @@ definitions:
       user_id:
         type: string
     type: object
+  github_com_oqart_backend_internal_delivery_http_dto.AdminDocumentVerificationRequest:
+    properties:
+      rejection_reason:
+        type: string
+      status:
+        enum:
+        - approved
+        - rejected
+        type: string
+    required:
+    - status
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.AdminVendorApprovalRequest:
+    properties:
+      rejection_reason:
+        type: string
+      status:
+        enum:
+        - approved
+        - rejected
+        - suspended
+        type: string
+    required:
+    - status
+    type: object
   github_com_oqart_backend_internal_delivery_http_dto.AuthResponse:
     properties:
       access_token:
@@ -312,6 +337,20 @@ definitions:
     - first_name
     - last_name
     type: object
+  github_com_oqart_backend_internal_delivery_http_dto.UpdateVendorProfileRequest:
+    properties:
+      banner_url:
+        type: string
+      business_name:
+        maxLength: 255
+        minLength: 3
+        type: string
+      description:
+        maxLength: 1000
+        type: string
+      logo_url:
+        type: string
+    type: object
   github_com_oqart_backend_internal_delivery_http_dto.UserResponse:
     properties:
       avatar:
@@ -339,6 +378,298 @@ definitions:
       status:
         type: string
       updated_at:
+        type: string
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.VendorAddressResponse:
+    properties:
+      city:
+        type: string
+      country:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      is_primary:
+        type: boolean
+      landmark:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      pincode:
+        type: string
+      state:
+        type: string
+      street_address:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+      vendor_id:
+        type: string
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.VendorBankDetailsResponse:
+    properties:
+      account_holder_name:
+        type: string
+      account_number_masked:
+        description: Masked for security
+        type: string
+      account_type:
+        type: string
+      bank_name:
+        type: string
+      branch_name:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      ifsc_code:
+        type: string
+      is_verified:
+        type: boolean
+      updated_at:
+        type: string
+      vendor_id:
+        type: string
+      verified_at:
+        type: string
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.VendorContactPersonResponse:
+    properties:
+      created_at:
+        type: string
+      designation:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      is_primary:
+        type: boolean
+      name:
+        type: string
+      phone:
+        type: string
+      updated_at:
+        type: string
+      vendor_id:
+        type: string
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.VendorDetailedResponse:
+    properties:
+      address:
+        $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorAddressResponse'
+      bank_details:
+        $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorBankDetailsResponse'
+      contact_person:
+        $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorContactPersonResponse'
+      documents:
+        items:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorDocumentResponse'
+        type: array
+      vendor:
+        $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorResponse'
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.VendorDocumentResponse:
+    properties:
+      created_at:
+        type: string
+      file_name:
+        type: string
+      file_size:
+        type: integer
+      id:
+        type: string
+      rejection_reason:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+      vendor_id:
+        type: string
+      verified_at:
+        type: string
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.VendorListResponse:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+      vendors:
+        items:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorResponse'
+        type: array
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.VendorOnboardingStep1Request:
+    properties:
+      business_name:
+        maxLength: 255
+        minLength: 3
+        type: string
+      business_type:
+        enum:
+        - individual
+        - proprietorship
+        - partnership
+        - private_limited
+        - public_limited
+        - llp
+        type: string
+      description:
+        maxLength: 1000
+        type: string
+      fssai_number:
+        type: string
+      gstin:
+        type: string
+      pan:
+        type: string
+    required:
+    - business_name
+    - business_type
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.VendorOnboardingStep2Request:
+    properties:
+      city:
+        maxLength: 100
+        minLength: 2
+        type: string
+      country:
+        maxLength: 100
+        minLength: 2
+        type: string
+      landmark:
+        maxLength: 255
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      pincode:
+        type: string
+      state:
+        maxLength: 100
+        minLength: 2
+        type: string
+      street_address:
+        maxLength: 255
+        minLength: 5
+        type: string
+    required:
+    - city
+    - country
+    - pincode
+    - state
+    - street_address
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.VendorOnboardingStep3Request:
+    properties:
+      account_holder_name:
+        maxLength: 255
+        minLength: 3
+        type: string
+      account_number:
+        maxLength: 18
+        minLength: 9
+        type: string
+      account_type:
+        enum:
+        - savings
+        - current
+        type: string
+      bank_name:
+        maxLength: 255
+        minLength: 2
+        type: string
+      branch_name:
+        maxLength: 255
+        type: string
+      ifsc_code:
+        type: string
+    required:
+    - account_holder_name
+    - account_number
+    - account_type
+    - bank_name
+    - ifsc_code
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.VendorOnboardingStep4Request:
+    properties:
+      designation:
+        maxLength: 100
+        type: string
+      email:
+        type: string
+      name:
+        maxLength: 255
+        minLength: 3
+        type: string
+      phone:
+        type: string
+    required:
+    - name
+    - phone
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.VendorResponse:
+    properties:
+      approved_at:
+        type: string
+      banner_url:
+        type: string
+      business_name:
+        type: string
+      business_type:
+        type: string
+      commission_rate:
+        type: number
+      created_at:
+        type: string
+      description:
+        type: string
+      fssai_number:
+        type: string
+      gstin:
+        type: string
+      id:
+        type: string
+      is_featured:
+        type: boolean
+      is_verified:
+        type: boolean
+      logo_url:
+        type: string
+      onboarding_step:
+        type: integer
+      pan:
+        type: string
+      rating:
+        type: number
+      rejection_reason:
+        type: string
+      status:
+        type: string
+      total_orders:
+        type: integer
+      total_reviews:
+        type: integer
+      total_sales:
+        type: number
+      updated_at:
+        type: string
+      user_id:
         type: string
     type: object
   github_com_oqart_backend_internal_delivery_http_dto.VerifyOTPRequest:
@@ -374,6 +705,106 @@ info:
   title: OQart Backend API
   version: "1.0"
 paths:
+  /admin/vendors/{id}/approve:
+    post:
+      consumes:
+      - application/json
+      description: Admin endpoint to approve, reject, or suspend a vendor
+      parameters:
+      - description: Vendor ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Approval decision
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.AdminVendorApprovalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Vendor status updated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid input or validation error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "403":
+          description: Forbidden - Admin access required
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "404":
+          description: Vendor not found
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Approve or reject vendor (Admin only)
+      tags:
+      - Admin - Vendor Management
+  /admin/vendors/documents/{id}/verify:
+    put:
+      consumes:
+      - application/json
+      description: Admin endpoint to verify or reject a vendor's uploaded document
+      parameters:
+      - description: Document ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Verification decision
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.AdminDocumentVerificationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Document verified successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid input or validation error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "403":
+          description: Forbidden - Admin access required
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "404":
+          description: Document not found
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Verify or reject vendor document (Admin only)
+      tags:
+      - Admin - Vendor Management
   /auth/forgot-password:
     post:
       consumes:
@@ -1110,6 +1541,353 @@ paths:
       summary: Update user preferences
       tags:
       - User Management
+  /vendors:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of vendors with optional filters
+      parameters:
+      - default: 1
+        description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: 'Page size (default: 20, max: 100)'
+        in: query
+        name: page_size
+        type: integer
+      - description: Filter by status (pending, under_review, approved, rejected,
+          suspended, inactive)
+        in: query
+        name: status
+        type: string
+      - description: Filter by verification status
+        in: query
+        name: is_verified
+        type: boolean
+      - description: Filter by featured status
+        in: query
+        name: is_featured
+        type: boolean
+      - description: Search by business name or description
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorListResponse'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      summary: List vendors
+      tags:
+      - Vendors
+  /vendors/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get public vendor profile by vendor ID (only approved vendors)
+      parameters:
+      - description: Vendor ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorResponse'
+        "400":
+          description: Invalid vendor ID
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "404":
+          description: Vendor not found
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      summary: Get vendor by ID
+      tags:
+      - Vendors
+  /vendors/me:
+    get:
+      consumes:
+      - application/json
+      description: Get the authenticated vendor's complete profile with all details
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorDetailedResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "404":
+          description: Vendor not found
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get vendor dashboard
+      tags:
+      - Vendor Management
+    put:
+      consumes:
+      - application/json
+      description: Update the authenticated vendor's profile information
+      parameters:
+      - description: Profile update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.UpdateVendorProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorResponse'
+        "400":
+          description: Invalid input or validation error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "404":
+          description: Vendor not found
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update vendor profile
+      tags:
+      - Vendor Management
+  /vendors/me/documents:
+    get:
+      consumes:
+      - application/json
+      description: Get all documents uploaded by the authenticated vendor
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorDocumentResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "404":
+          description: Vendor not found
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get vendor documents
+      tags:
+      - Vendor Management
+  /vendors/onboard/step1:
+    post:
+      consumes:
+      - application/json
+      description: Complete the first step of vendor onboarding by providing business
+        details
+      parameters:
+      - description: Business details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorOnboardingStep1Request'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorResponse'
+        "400":
+          description: Invalid input or validation error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "409":
+          description: Vendor already exists
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Vendor onboarding - Step 1 (Business Details)
+      tags:
+      - Vendor Onboarding
+  /vendors/onboard/step2:
+    post:
+      consumes:
+      - application/json
+      description: Complete the second step of vendor onboarding by providing business
+        address
+      parameters:
+      - description: Business address
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorOnboardingStep2Request'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorAddressResponse'
+        "400":
+          description: Invalid input or validation error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "404":
+          description: Vendor not found
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Vendor onboarding - Step 2 (Business Address)
+      tags:
+      - Vendor Onboarding
+  /vendors/onboard/step3:
+    post:
+      consumes:
+      - application/json
+      description: Complete the third step of vendor onboarding by providing bank
+        details
+      parameters:
+      - description: Bank details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorOnboardingStep3Request'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorBankDetailsResponse'
+        "400":
+          description: Invalid input or validation error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "404":
+          description: Vendor not found
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Vendor onboarding - Step 3 (Bank Details)
+      tags:
+      - Vendor Onboarding
+  /vendors/onboard/step4:
+    post:
+      consumes:
+      - application/json
+      description: Complete the final step of vendor onboarding by providing contact
+        person details
+      parameters:
+      - description: Contact person details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorOnboardingStep4Request'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VendorContactPersonResponse'
+        "400":
+          description: Invalid input or validation error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "404":
+          description: Vendor not found
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Vendor onboarding - Step 4 (Contact Person)
+      tags:
+      - Vendor Onboarding
 schemes:
 - http
 - https

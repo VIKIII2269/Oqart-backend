@@ -95,17 +95,41 @@ type OTP struct {
 }
 
 type UserPreferences struct {
-	ID                 uuid.UUID `gorm:"type:uuid;primary_key;default:uuid_generate_v4()" json:"id"`
-	UserID             uuid.UUID `gorm:"type:uuid;not null;uniqueIndex" json:"user_id"`
-	Language           string    `gorm:"size:10;default:'en'" json:"language"`
-	Currency           string    `gorm:"size:10;default:'INR'" json:"currency"`
-	Timezone           string    `gorm:"size:50;default:'Asia/Kolkata'" json:"timezone"`
-	EmailNotifications bool      `gorm:"default:true" json:"email_notifications"`
-	SMSNotifications   bool      `gorm:"default:true" json:"sms_notifications"`
-	PushNotifications  bool      `gorm:"default:true" json:"push_notifications"`
-	MarketingEmails    bool      `gorm:"default:true" json:"marketing_emails"`
-	CreatedAt          time.Time `json:"created_at"`
-	UpdatedAt          time.Time `json:"updated_at"`
+	ID                   uuid.UUID `gorm:"type:uuid;primary_key;default:uuid_generate_v4()" json:"id"`
+	UserID               uuid.UUID `gorm:"type:uuid;not null;uniqueIndex" json:"user_id"`
+	Language             string    `gorm:"size:10;default:'en'" json:"language"`
+	Currency             string    `gorm:"size:10;default:'INR'" json:"currency"`
+	Timezone             string    `gorm:"size:50;default:'Asia/Kolkata'" json:"timezone"`
+	NotificationEmail    bool      `gorm:"default:true" json:"notification_email"`
+	NotificationSMS      bool      `gorm:"default:true" json:"notification_sms"`
+	NotificationPush     bool      `gorm:"default:true" json:"notification_push"`
+	MarketingEmails      bool      `gorm:"default:false" json:"marketing_emails"`
+	OrderUpdates         bool      `gorm:"default:true" json:"order_updates"`
+	NewsletterSubscribed bool      `gorm:"default:false" json:"newsletter_subscribed"`
+	TwoFactorEnabled     bool      `gorm:"default:false" json:"two_factor_enabled"`
+	CreatedAt            time.Time `json:"created_at"`
+	UpdatedAt            time.Time `json:"updated_at"`
+
+	User User `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE" json:"user,omitempty"`
+}
+
+type Address struct {
+	ID         uuid.UUID `gorm:"type:uuid;primary_key;default:uuid_generate_v4()" json:"id"`
+	UserID     uuid.UUID `gorm:"type:uuid;not null;index" json:"user_id"`
+	Type       string    `gorm:"size:50;default:'home'" json:"type"`
+	FullName   string    `gorm:"size:255;not null" json:"full_name"`
+	Phone      string    `gorm:"size:20;not null" json:"phone"`
+	Street     string    `gorm:"size:255;not null" json:"street"`
+	Landmark   *string   `gorm:"size:255" json:"landmark,omitempty"`
+	City       string    `gorm:"size:100;not null" json:"city"`
+	State      string    `gorm:"size:100;not null" json:"state"`
+	Pincode    string    `gorm:"size:10;not null" json:"pincode"`
+	Country    string    `gorm:"size:100;default:'India'" json:"country"`
+	IsDefault  bool      `gorm:"default:false" json:"is_default"`
+	Latitude   *float64  `gorm:"type:decimal(10,8)" json:"latitude,omitempty"`
+	Longitude  *float64  `gorm:"type:decimal(11,8)" json:"longitude,omitempty"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
 
 	User User `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE" json:"user,omitempty"`
 }
@@ -117,6 +141,7 @@ func (PasswordReset) TableName() string        { return "password_resets" }
 func (EmailVerification) TableName() string    { return "email_verifications" }
 func (OTP) TableName() string                  { return "otps" }
 func (UserPreferences) TableName() string      { return "user_preferences" }
+func (Address) TableName() string              { return "addresses" }
 
 // Helper methods
 func (u *User) FullName() string {

@@ -33,15 +33,15 @@ type UserUseCase interface {
 }
 
 type userUseCase struct {
-	userRepo    *postgres.UserRepository
-	addressRepo *postgres.AddressRepository
+	userRepo    postgres.UserRepository
+	addressRepo postgres.AddressRepository
 	cache       *cache.Cache
 	logger      *logger.Logger
 }
 
 func NewUserUseCase(
-	userRepo *postgres.UserRepository,
-	addressRepo *postgres.AddressRepository,
+	userRepo postgres.UserRepository,
+	addressRepo postgres.AddressRepository,
 	cache *cache.Cache,
 	logger *logger.Logger,
 ) UserUseCase {
@@ -57,7 +57,7 @@ func NewUserUseCase(
 func (uc *userUseCase) GetProfile(ctx context.Context, userID uuid.UUID) (*dto.UserResponse, error) {
 	user, err := uc.userRepo.GetByID(ctx, userID)
 	if err != nil {
-		uc.logger.Error("Failed to get user profile", "error", err, "user_id", userID)
+		uc.logger.Error("Failed to get user profile", err, "user_id", userID)
 		return nil, err
 	}
 
@@ -68,7 +68,7 @@ func (uc *userUseCase) GetProfile(ctx context.Context, userID uuid.UUID) (*dto.U
 func (uc *userUseCase) UpdateProfile(ctx context.Context, userID uuid.UUID, req *dto.UpdateProfileRequest) (*dto.UserResponse, error) {
 	user, err := uc.userRepo.GetByID(ctx, userID)
 	if err != nil {
-		uc.logger.Error("Failed to get user", "error", err, "user_id", userID)
+		uc.logger.Error("Failed to get user", err, "user_id", userID)
 		return nil, err
 	}
 
@@ -79,11 +79,11 @@ func (uc *userUseCase) UpdateProfile(ctx context.Context, userID uuid.UUID, req 
 		user.Phone = req.Phone
 	}
 	if req.Avatar != nil {
-		user.Avatar = req.Avatar
+		user.AvatarURL = req.Avatar
 	}
 
 	if err := uc.userRepo.Update(ctx, user); err != nil {
-		uc.logger.Error("Failed to update user profile", "error", err, "user_id", userID)
+		uc.logger.Error("Failed to update user profile", err, "user_id", userID)
 		return nil, err
 	}
 
@@ -95,12 +95,15 @@ func (uc *userUseCase) UpdateProfile(ctx context.Context, userID uuid.UUID, req 
 func (uc *userUseCase) ChangePassword(ctx context.Context, userID uuid.UUID, req *dto.ChangePasswordRequest) error {
 	user, err := uc.userRepo.GetByID(ctx, userID)
 	if err != nil {
-		uc.logger.Error("Failed to get user", "error", err, "user_id", userID)
+		uc.logger.Error("Failed to get user", err, "user_id", userID)
 		return err
 	}
 
 	// Verify current password
-	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.CurrentPassword)); err != nil {
+	if user.PasswordHash == nil {
+		return apperrors.ErrInvalidCredentials
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(*user.PasswordHash), []byte(req.CurrentPassword)); err != nil {
 		return apperrors.ErrInvalidCredentials
 	}
 
@@ -111,10 +114,11 @@ func (uc *userUseCase) ChangePassword(ctx context.Context, userID uuid.UUID, req
 		return apperrors.ErrInternal
 	}
 
-	user.PasswordHash = string(hashedPassword)
+	hashedStr := string(hashedPassword)
+	user.PasswordHash = &hashedStr
 
 	if err := uc.userRepo.Update(ctx, user); err != nil {
-		uc.logger.Error("Failed to update password", "error", err, "user_id", userID)
+		uc.logger.Error("Failed to update password", err, "user_id", userID)
 		return err
 	}
 
@@ -126,7 +130,7 @@ func (uc *userUseCase) ChangePassword(ctx context.Context, userID uuid.UUID, req
 func (uc *userUseCase) UpdateEmail(ctx context.Context, userID uuid.UUID, req *dto.UpdateEmailRequest) error {
 	user, err := uc.userRepo.GetByID(ctx, userID)
 	if err != nil {
-		uc.logger.Error("Failed to get user", "error", err, "user_id", userID)
+		uc.logger.Error("Failed to get user", err, "user_id", userID)
 		return err
 	}
 
@@ -148,7 +152,7 @@ func (uc *userUseCase) UpdateEmail(ctx context.Context, userID uuid.UUID, req *d
 	user.EmailVerified = false // Reset email verification
 
 	if err := uc.userRepo.Update(ctx, user); err != nil {
-		uc.logger.Error("Failed to update email", "error", err, "user_id", userID)
+		uc.logger.Error("Failed to update email", err, "user_id", userID)
 		return err
 	}
 
@@ -160,7 +164,7 @@ func (uc *userUseCase) UpdateEmail(ctx context.Context, userID uuid.UUID, req *d
 func (uc *userUseCase) UpdatePhone(ctx context.Context, userID uuid.UUID, req *dto.UpdatePhoneRequest) error {
 	user, err := uc.userRepo.GetByID(ctx, userID)
 	if err != nil {
-		uc.logger.Error("Failed to get user", "error", err, "user_id", userID)
+		uc.logger.Error("Failed to get user", err, "user_id", userID)
 		return err
 	}
 
@@ -182,7 +186,7 @@ func (uc *userUseCase) UpdatePhone(ctx context.Context, userID uuid.UUID, req *d
 	user.PhoneVerified = false // Reset phone verification
 
 	if err := uc.userRepo.Update(ctx, user); err != nil {
-		uc.logger.Error("Failed to update phone", "error", err, "user_id", userID)
+		uc.logger.Error("Failed to update phone", err, "user_id", userID)
 		return err
 	}
 
@@ -194,15 +198,15 @@ func (uc *userUseCase) UpdatePhone(ctx context.Context, userID uuid.UUID, req *d
 func (uc *userUseCase) DeleteAccount(ctx context.Context, userID uuid.UUID) error {
 	user, err := uc.userRepo.GetByID(ctx, userID)
 	if err != nil {
-		uc.logger.Error("Failed to get user", "error", err, "user_id", userID)
+		uc.logger.Error("Failed to get user", err, "user_id", userID)
 		return err
 	}
 
 	// Update status to inactive
-	user.Status = domain.UserStatusInactive
+	user.Status = domain.StatusInactive
 
 	if err := uc.userRepo.Update(ctx, user); err != nil {
-		uc.logger.Error("Failed to delete account", "error", err, "user_id", userID)
+		uc.logger.Error("Failed to delete account", err, "user_id", userID)
 		return err
 	}
 
@@ -214,7 +218,7 @@ func (uc *userUseCase) DeleteAccount(ctx context.Context, userID uuid.UUID) erro
 func (uc *userUseCase) GetPreferences(ctx context.Context, userID uuid.UUID) (*dto.PreferencesResponse, error) {
 	prefs, err := uc.userRepo.GetPreferences(ctx, userID)
 	if err != nil {
-		uc.logger.Error("Failed to get preferences", "error", err, "user_id", userID)
+		uc.logger.Error("Failed to get preferences", err, "user_id", userID)
 		return nil, err
 	}
 
@@ -225,7 +229,7 @@ func (uc *userUseCase) GetPreferences(ctx context.Context, userID uuid.UUID) (*d
 func (uc *userUseCase) UpdatePreferences(ctx context.Context, userID uuid.UUID, req *dto.UpdatePreferencesRequest) (*dto.PreferencesResponse, error) {
 	prefs, err := uc.userRepo.GetPreferences(ctx, userID)
 	if err != nil {
-		uc.logger.Error("Failed to get preferences", "error", err, "user_id", userID)
+		uc.logger.Error("Failed to get preferences", err, "user_id", userID)
 		return nil, err
 	}
 
@@ -259,7 +263,7 @@ func (uc *userUseCase) UpdatePreferences(ctx context.Context, userID uuid.UUID, 
 	}
 
 	if err := uc.userRepo.UpdatePreferences(ctx, prefs); err != nil {
-		uc.logger.Error("Failed to update preferences", "error", err, "user_id", userID)
+		uc.logger.Error("Failed to update preferences", err, "user_id", userID)
 		return nil, err
 	}
 
@@ -271,7 +275,7 @@ func (uc *userUseCase) UpdatePreferences(ctx context.Context, userID uuid.UUID, 
 func (uc *userUseCase) GetAddresses(ctx context.Context, userID uuid.UUID) ([]*dto.AddressResponse, error) {
 	addresses, err := uc.addressRepo.GetByUserID(ctx, userID)
 	if err != nil {
-		uc.logger.Error("Failed to get addresses", "error", err, "user_id", userID)
+		uc.logger.Error("Failed to get addresses", err, "user_id", userID)
 		return nil, err
 	}
 
@@ -290,13 +294,13 @@ func (uc *userUseCase) CreateAddress(ctx context.Context, userID uuid.UUID, req 
 		UserID:       userID,
 		FullName:     req.FullName,
 		Phone:        req.Phone,
-		AddressLine1: req.AddressLine1,
-		AddressLine2: req.AddressLine2,
+		Street: req.Street,
+		Landmark: req.Landmark,
 		City:         req.City,
 		State:        req.State,
 		Pincode:      req.Pincode,
 		Country:      req.Country,
-		AddressType:  req.AddressType,
+		Type:  req.Type,
 		IsDefault:    req.IsDefault,
 		Latitude:     req.Latitude,
 		Longitude:    req.Longitude,
@@ -305,13 +309,13 @@ func (uc *userUseCase) CreateAddress(ctx context.Context, userID uuid.UUID, req 
 	// If this is marked as default, unset all other defaults first
 	if req.IsDefault {
 		if err := uc.addressRepo.SetDefaultAddress(ctx, userID, address.ID); err != nil {
-			uc.logger.Error("Failed to set default address", "error", err, "user_id", userID)
+			uc.logger.Error("Failed to set default address", err, "user_id", userID)
 			return nil, err
 		}
 	}
 
 	if err := uc.addressRepo.Create(ctx, address); err != nil {
-		uc.logger.Error("Failed to create address", "error", err, "user_id", userID)
+		uc.logger.Error("Failed to create address", err, "user_id", userID)
 		return nil, err
 	}
 
@@ -332,7 +336,7 @@ func (uc *userUseCase) UpdateAddress(ctx context.Context, userID, addressID uuid
 
 	address, err := uc.addressRepo.GetByID(ctx, addressID)
 	if err != nil {
-		uc.logger.Error("Failed to get address", "error", err, "address_id", addressID)
+		uc.logger.Error("Failed to get address", err, "address_id", addressID)
 		return nil, err
 	}
 
@@ -343,11 +347,11 @@ func (uc *userUseCase) UpdateAddress(ctx context.Context, userID, addressID uuid
 	if req.Phone != nil {
 		address.Phone = *req.Phone
 	}
-	if req.AddressLine1 != nil {
-		address.AddressLine1 = *req.AddressLine1
+	if req.Street != nil {
+		address.Street = *req.Street
 	}
-	if req.AddressLine2 != nil {
-		address.AddressLine2 = req.AddressLine2
+	if req.Landmark != nil {
+		address.Landmark = req.Landmark
 	}
 	if req.City != nil {
 		address.City = *req.City
@@ -361,8 +365,8 @@ func (uc *userUseCase) UpdateAddress(ctx context.Context, userID, addressID uuid
 	if req.Country != nil {
 		address.Country = *req.Country
 	}
-	if req.AddressType != nil {
-		address.AddressType = *req.AddressType
+	if req.Type != nil {
+		address.Type = *req.Type
 	}
 	if req.Latitude != nil {
 		address.Latitude = req.Latitude
@@ -372,7 +376,7 @@ func (uc *userUseCase) UpdateAddress(ctx context.Context, userID, addressID uuid
 	}
 
 	if err := uc.addressRepo.Update(ctx, address); err != nil {
-		uc.logger.Error("Failed to update address", "error", err, "address_id", addressID)
+		uc.logger.Error("Failed to update address", err, "address_id", addressID)
 		return nil, err
 	}
 
@@ -392,7 +396,7 @@ func (uc *userUseCase) DeleteAddress(ctx context.Context, userID, addressID uuid
 	}
 
 	if err := uc.addressRepo.Delete(ctx, addressID); err != nil {
-		uc.logger.Error("Failed to delete address", "error", err, "address_id", addressID)
+		uc.logger.Error("Failed to delete address", err, "address_id", addressID)
 		return err
 	}
 
@@ -412,7 +416,7 @@ func (uc *userUseCase) SetDefaultAddress(ctx context.Context, userID, addressID 
 	}
 
 	if err := uc.addressRepo.SetDefaultAddress(ctx, userID, addressID); err != nil {
-		uc.logger.Error("Failed to set default address", "error", err, "address_id", addressID)
+		uc.logger.Error("Failed to set default address", err, "address_id", addressID)
 		return err
 	}
 
@@ -463,13 +467,13 @@ func (uc *userUseCase) mapAddressToResponse(addr *domain.Address) *dto.AddressRe
 		UserID:       addr.UserID.String(),
 		FullName:     addr.FullName,
 		Phone:        addr.Phone,
-		AddressLine1: addr.AddressLine1,
-		AddressLine2: addr.AddressLine2,
+		Street: addr.Street,
+		Landmark: addr.Landmark,
 		City:         addr.City,
 		State:        addr.State,
 		Pincode:      addr.Pincode,
 		Country:      addr.Country,
-		AddressType:  addr.AddressType,
+		Type:  addr.Type,
 		IsDefault:    addr.IsDefault,
 		Latitude:     addr.Latitude,
 		Longitude:    addr.Longitude,
