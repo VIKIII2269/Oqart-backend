@@ -67,6 +67,9 @@ var (
 	ErrUserNotFound    = New("USER_NOT_FOUND", "User not found", http.StatusNotFound)
 	ErrProductNotFound = New("PRODUCT_NOT_FOUND", "Product not found", http.StatusNotFound)
 	ErrOrderNotFound   = New("ORDER_NOT_FOUND", "Order not found", http.StatusNotFound)
+	ErrAddressNotFound = New("ADDRESS_NOT_FOUND", "Address not found", http.StatusNotFound)
+	ErrVendorNotFound  = New("VENDOR_NOT_FOUND", "Vendor not found", http.StatusNotFound)
+	ErrCartNotFound    = New("CART_NOT_FOUND", "Cart not found", http.StatusNotFound)
 
 	// 409 Conflict
 	ErrConflict         = New("CONFLICT", "Resource conflict", http.StatusConflict)

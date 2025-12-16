@@ -26,6 +26,8 @@ help:
 	@echo "  make fmt           - Format code"
 	@echo "  make deps          - Install dependencies"
 	@echo "  make tidy          - Tidy go modules"
+	@echo "  make swagger       - Generate Swagger documentation"
+	@echo "  make swagger-install - Install Swagger CLI tool"
 
 ## run: Run the application
 run:
@@ -186,3 +188,19 @@ db-reset:
 	@echo "Database reset complete"
 
 .DEFAULT_GOAL := help
+
+## swagger: Generate Swagger documentation
+swagger:
+	@echo "Generating Swagger documentation..."
+	@if ! command -v swag &> /dev/null; then \
+		echo "Swagger CLI not found. Installing..."; \
+		go install github.com/swaggo/swag/cmd/swag@v1.16.3; \
+	fi
+	@$(HOME)/go/bin/swag init -g cmd/api/main.go -o docs --parseDependency --parseInternal
+	@echo "Swagger documentation generated in ./docs"
+
+## swagger-install: Install Swagger CLI tool
+swagger-install:
+	@echo "Installing Swagger CLI..."
+	go install github.com/swaggo/swag/cmd/swag@v1.16.3
+	@echo "Swagger CLI installed successfully"

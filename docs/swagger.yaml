@@ -1,0 +1,1122 @@
+basePath: /api/v1
+definitions:
+  github_com_oqart_backend_internal_delivery_http_dto.AddressResponse:
+    properties:
+      address_line1:
+        type: string
+      address_line2:
+        type: string
+      address_type:
+        type: string
+      city:
+        type: string
+      country:
+        type: string
+      created_at:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: string
+      is_default:
+        type: boolean
+      latitude:
+        type: number
+      longitude:
+        type: number
+      phone:
+        type: string
+      pincode:
+        type: string
+      state:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.AuthResponse:
+    properties:
+      access_token:
+        type: string
+      expires_at:
+        type: string
+      refresh_token:
+        type: string
+      user:
+        $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.UserResponse'
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.ChangePasswordRequest:
+    properties:
+      current_password:
+        type: string
+      new_password:
+        type: string
+    required:
+    - current_password
+    - new_password
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.CreateAddressRequest:
+    properties:
+      address_line1:
+        maxLength: 255
+        minLength: 5
+        type: string
+      address_line2:
+        maxLength: 255
+        type: string
+      address_type:
+        enum:
+        - home
+        - work
+        - other
+        type: string
+      city:
+        maxLength: 100
+        minLength: 2
+        type: string
+      country:
+        maxLength: 100
+        minLength: 2
+        type: string
+      full_name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      is_default:
+        type: boolean
+      latitude:
+        type: number
+      longitude:
+        type: number
+      phone:
+        type: string
+      pincode:
+        type: string
+      state:
+        maxLength: 100
+        minLength: 2
+        type: string
+    required:
+    - address_line1
+    - address_type
+    - city
+    - country
+    - full_name
+    - phone
+    - pincode
+    - state
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.ForgotPasswordRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.MessageResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.OTPResponse:
+    properties:
+      expires_at:
+        type: string
+      message:
+        type: string
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.PhoneLoginRequest:
+    properties:
+      phone:
+        type: string
+    required:
+    - phone
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.PreferencesResponse:
+    properties:
+      created_at:
+        type: string
+      currency:
+        type: string
+      language:
+        type: string
+      marketing_emails:
+        type: boolean
+      newsletter_subscribed:
+        type: boolean
+      notification_email:
+        type: boolean
+      notification_push:
+        type: boolean
+      notification_sms:
+        type: boolean
+      order_updates:
+        type: boolean
+      two_factor_enabled:
+        type: boolean
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.RegisterRequest:
+    properties:
+      email:
+        type: string
+      first_name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      last_name:
+        maxLength: 100
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+    required:
+    - email
+    - first_name
+    - password
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.ResetPasswordRequest:
+    properties:
+      password:
+        type: string
+      token:
+        type: string
+    required:
+    - password
+    - token
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.UpdateAddressRequest:
+    properties:
+      address_line1:
+        maxLength: 255
+        minLength: 5
+        type: string
+      address_line2:
+        maxLength: 255
+        type: string
+      address_type:
+        enum:
+        - home
+        - work
+        - other
+        type: string
+      city:
+        maxLength: 100
+        minLength: 2
+        type: string
+      country:
+        maxLength: 100
+        minLength: 2
+        type: string
+      full_name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      phone:
+        type: string
+      pincode:
+        type: string
+      state:
+        maxLength: 100
+        minLength: 2
+        type: string
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.UpdateEmailRequest:
+    properties:
+      new_email:
+        type: string
+      password:
+        type: string
+    required:
+    - new_email
+    - password
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.UpdatePhoneRequest:
+    properties:
+      new_phone:
+        type: string
+      password:
+        type: string
+    required:
+    - new_phone
+    - password
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.UpdatePreferencesRequest:
+    properties:
+      currency:
+        enum:
+        - INR
+        - USD
+        type: string
+      language:
+        enum:
+        - en
+        - hi
+        type: string
+      marketing_emails:
+        type: boolean
+      newsletter_subscribed:
+        type: boolean
+      notification_email:
+        type: boolean
+      notification_push:
+        type: boolean
+      notification_sms:
+        type: boolean
+      order_updates:
+        type: boolean
+      two_factor_enabled:
+        type: boolean
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.UpdateProfileRequest:
+    properties:
+      avatar:
+        type: string
+      first_name:
+        maxLength: 50
+        minLength: 2
+        type: string
+      last_name:
+        maxLength: 50
+        minLength: 2
+        type: string
+      phone:
+        type: string
+    required:
+    - first_name
+    - last_name
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.UserResponse:
+    properties:
+      avatar:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      email_verified:
+        type: boolean
+      first_name:
+        type: string
+      id:
+        type: string
+      last_login_at:
+        type: string
+      last_name:
+        type: string
+      phone:
+        type: string
+      phone_verified:
+        type: boolean
+      role:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  github_com_oqart_backend_internal_delivery_http_dto.VerifyOTPRequest:
+    properties:
+      code:
+        type: string
+      phone:
+        type: string
+    required:
+    - code
+    - phone
+    type: object
+  github_com_oqart_backend_pkg_errors.ErrorResponse:
+    properties:
+      code:
+        type: string
+      details: {}
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@oqart.com
+    name: API Support
+    url: https://oqart.com/support
+  description: Production-grade e-commerce backend for OQart - India's premier organic
+    products marketplace
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: https://oqart.com/terms
+  title: OQart Backend API
+  version: "1.0"
+paths:
+  /auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: Send password reset link to email
+      parameters:
+      - description: Email address
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.ForgotPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      summary: Request password reset
+      tags:
+      - Authentication
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user with email and password
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      summary: Login with email and password
+      tags:
+      - Authentication
+  /auth/login/phone:
+    post:
+      consumes:
+      - application/json
+      description: Send OTP for phone number authentication
+      parameters:
+      - description: Phone number
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.PhoneLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.OTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      summary: Send OTP to phone number
+      tags:
+      - Authentication
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout user and invalidate all sessions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.MessageResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Logout user
+      tags:
+      - Authentication
+  /auth/refresh-token:
+    post:
+      consumes:
+      - application/json
+      description: Get new access token using refresh token
+      parameters:
+      - description: Refresh token
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      summary: Refresh access token
+      tags:
+      - Authentication
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with email and password
+      parameters:
+      - description: Registration details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      summary: Register a new user
+      tags:
+      - Authentication
+  /auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Reset password using reset token
+      parameters:
+      - description: Reset token and new password
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.ResetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      summary: Reset password
+      tags:
+      - Authentication
+  /auth/verify-email:
+    get:
+      consumes:
+      - application/json
+      description: Verify email using verification token
+      parameters:
+      - description: Verification token
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      summary: Verify email address
+      tags:
+      - Authentication
+  /auth/verify-otp:
+    post:
+      consumes:
+      - application/json
+      description: Verify OTP code and authenticate user
+      parameters:
+      - description: Phone and OTP code
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.VerifyOTPRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      summary: Verify OTP and login
+      tags:
+      - Authentication
+  /users/me:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete the authenticated user's account
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.MessageResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete user account
+      tags:
+      - User Management
+    get:
+      consumes:
+      - application/json
+      description: Get the authenticated user's profile information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.UserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get current user profile
+      tags:
+      - User Management
+    put:
+      consumes:
+      - application/json
+      description: Update the authenticated user's profile information
+      parameters:
+      - description: Profile update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.UpdateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update current user profile
+      tags:
+      - User Management
+  /users/me/addresses:
+    get:
+      consumes:
+      - application/json
+      description: Get all addresses for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.AddressResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user addresses
+      tags:
+      - Address Management
+    post:
+      consumes:
+      - application/json
+      description: Create a new address for the authenticated user
+      parameters:
+      - description: Address data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.CreateAddressRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.AddressResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create new address
+      tags:
+      - Address Management
+  /users/me/addresses/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an address for the authenticated user
+      parameters:
+      - description: Address ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete address
+      tags:
+      - Address Management
+    put:
+      consumes:
+      - application/json
+      description: Update an existing address for the authenticated user
+      parameters:
+      - description: Address ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Address update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.UpdateAddressRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.AddressResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update address
+      tags:
+      - Address Management
+  /users/me/addresses/{id}/default:
+    put:
+      consumes:
+      - application/json
+      description: Set an address as the default for the authenticated user
+      parameters:
+      - description: Address ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Set default address
+      tags:
+      - Address Management
+  /users/me/email:
+    put:
+      consumes:
+      - application/json
+      description: Update the authenticated user's email address
+      parameters:
+      - description: Email update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.UpdateEmailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update user email
+      tags:
+      - User Management
+  /users/me/password:
+    put:
+      consumes:
+      - application/json
+      description: Change the authenticated user's password
+      parameters:
+      - description: Password change data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Change user password
+      tags:
+      - User Management
+  /users/me/phone:
+    put:
+      consumes:
+      - application/json
+      description: Update the authenticated user's phone number
+      parameters:
+      - description: Phone update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.UpdatePhoneRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update user phone number
+      tags:
+      - User Management
+  /users/me/preferences:
+    get:
+      consumes:
+      - application/json
+      description: Get the authenticated user's preferences
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.PreferencesResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user preferences
+      tags:
+      - User Management
+    put:
+      consumes:
+      - application/json
+      description: Update the authenticated user's preferences
+      parameters:
+      - description: Preferences update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.UpdatePreferencesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_internal_delivery_http_dto.PreferencesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_oqart_backend_pkg_errors.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update user preferences
+      tags:
+      - User Management
+schemes:
+- http
+- https
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and the JWT token
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

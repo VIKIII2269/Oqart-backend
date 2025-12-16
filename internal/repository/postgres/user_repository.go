@@ -23,6 +23,9 @@ type UserRepository interface {
 	VerifyPhone(ctx context.Context, id uuid.UUID) error
 	ChangePassword(ctx context.Context, id uuid.UUID, passwordHash string) error
 	List(ctx context.Context, filters map[string]interface{}, limit, offset int) ([]*domain.User, int64, error)
+	GetPreferences(ctx context.Context, userID uuid.UUID) (*domain.UserPreferences, error)
+	UpdatePreferences(ctx context.Context, preferences *domain.UserPreferences) error
+	CreatePreferences(ctx context.Context, preferences *domain.UserPreferences) error
 }
 
 type userRepository struct {
@@ -139,6 +142,48 @@ func (r *userRepository) List(ctx context.Context, filters map[string]interface{
 	}
 
 	return users, total, nil
+}
+
+func (r *userRepository) GetPreferences(ctx context.Context, userID uuid.UUID) (*domain.UserPreferences, error) {
+	var prefs domain.UserPreferences
+	if err := r.db.WithContext(ctx).First(&prefs, "user_id = ?", userID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// Create default preferences if none exist
+			prefs = domain.UserPreferences{
+				ID:                   uuid.New(),
+				UserID:               userID,
+				Language:             "en",
+				Currency:             "INR",
+				NotificationEmail:    true,
+				NotificationSMS:      true,
+				NotificationPush:     true,
+				MarketingEmails:      false,
+				OrderUpdates:         true,
+				NewsletterSubscribed: false,
+				TwoFactorEnabled:     false,
+			}
+			if err := r.db.WithContext(ctx).Create(&prefs).Error; err != nil {
+				return nil, fmt.Errorf("failed to create default preferences: %w", err)
+			}
+			return &prefs, nil
+		}
+		return nil, fmt.Errorf("failed to get preferences: %w", err)
+	}
+	return &prefs, nil
+}
+
+func (r *userRepository) UpdatePreferences(ctx context.Context, preferences *domain.UserPreferences) error {
+	if err := r.db.WithContext(ctx).Save(preferences).Error; err != nil {
+		return fmt.Errorf("failed to update preferences: %w", err)
+	}
+	return nil
+}
+
+func (r *userRepository) CreatePreferences(ctx context.Context, preferences *domain.UserPreferences) error {
+	if err := r.db.WithContext(ctx).Create(preferences).Error; err != nil {
+		return fmt.Errorf("failed to create preferences: %w", err)
+	}
+	return nil
 }
 
 // Session Repository

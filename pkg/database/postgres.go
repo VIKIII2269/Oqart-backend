@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"time"
@@ -111,5 +112,3 @@ func (d *Database) Health() error {
 
 	return nil
 }
-
-import "context"
