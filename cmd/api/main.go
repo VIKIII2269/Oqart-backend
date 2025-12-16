@@ -10,7 +10,11 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
 	"github.com/oqart/backend/config"
+	_ "github.com/oqart/backend/docs" // Swagger docs
 	"github.com/oqart/backend/internal/delivery/http/handler"
 	"github.com/oqart/backend/internal/delivery/http/middleware"
 	"github.com/oqart/backend/internal/repository/postgres"
@@ -86,6 +90,8 @@ func main() {
 	sessionRepo := postgres.NewSessionRepository(db.DB)
 	otpRepo := postgres.NewOTPRepository(db.DB)
 	passwordResetRepo := postgres.NewPasswordResetRepository(db.DB)
+	addressRepo := postgres.NewAddressRepository(db.DB)
+	userPreferencesRepo := postgres.NewUserPreferencesRepository(db.DB)
 
 	// Initialize use cases
 	authUseCase := usecase.NewAuthUseCase(
@@ -99,8 +105,19 @@ func main() {
 		log,
 	)
 
+	userUseCase := usecase.NewUserUseCase(
+		userRepo,
+		addressRepo,
+		userPreferencesRepo,
+		sessionRepo,
+		redisCache,
+		cfg,
+		log,
+	)
+
 	// Initialize handlers
 	authHandler := handler.NewAuthHandler(authUseCase, log)
+	userHandler := handler.NewUserHandler(userUseCase, log)
 
 	// Initialize middleware
 	authMiddleware := middleware.NewAuthMiddleware(jwtManager, userRepo)
@@ -120,6 +137,9 @@ func main() {
 	// Health check endpoint
 	router.GET("/health", healthCheckHandler(db, redisCache))
 	router.GET("/api/v1/health", healthCheckHandler(db, redisCache))
+
+	// Swagger documentation
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// API v1 routes
 	v1 := router.Group("/api/v1")
@@ -157,15 +177,25 @@ func main() {
 		users := v1.Group("/users")
 		users.Use(authMiddleware.RequireAuth())
 		{
-			// TODO: Add user management endpoints
-			// users.GET("/me", userHandler.GetMe)
-			// users.PUT("/me", userHandler.UpdateMe)
-			// users.PUT("/me/password", userHandler.ChangePassword)
-			// users.PUT("/me/email", userHandler.UpdateEmail)
-			// users.PUT("/me/phone", userHandler.UpdatePhone)
-			// users.DELETE("/me", userHandler.DeleteAccount)
-			// users.GET("/me/preferences", userHandler.GetPreferences)
-			// users.PUT("/me/preferences", userHandler.UpdatePreferences)
+			users.GET("/me", userHandler.GetMe)
+			users.PUT("/me", userHandler.UpdateMe)
+			users.PUT("/me/password", userHandler.ChangePassword)
+			users.PUT("/me/email", userHandler.UpdateEmail)
+			users.PUT("/me/phone", userHandler.UpdatePhone)
+			users.DELETE("/me", userHandler.DeleteAccount)
+			users.GET("/me/preferences", userHandler.GetPreferences)
+			users.PUT("/me/preferences", userHandler.UpdatePreferences)
+		}
+
+		// Address routes (protected)
+		addresses := v1.Group("/addresses")
+		addresses.Use(authMiddleware.RequireAuth())
+		{
+			addresses.POST("", userHandler.CreateAddress)
+			addresses.GET("", userHandler.GetAddresses)
+			addresses.GET("/:id", userHandler.GetAddress)
+			addresses.PUT("/:id", userHandler.UpdateAddress)
+			addresses.DELETE("/:id", userHandler.DeleteAddress)
 		}
 
 		// Vendor routes

@@ -111,5 +111,3 @@ func (d *Database) Health() error {
 
 	return nil
 }
-
-import "context"

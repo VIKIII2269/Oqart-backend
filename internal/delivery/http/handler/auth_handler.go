@@ -32,9 +32,9 @@ func NewAuthHandler(authUseCase usecase.AuthUseCase, logger *logger.Logger) *Aut
 // @Produce json
 // @Param request body dto.RegisterRequest true "Registration details"
 // @Success 201 {object} dto.AuthResponse
-// @Failure 400 {object} apperrors.ErrorResponse
-// @Failure 409 {object} apperrors.ErrorResponse
-// @Failure 500 {object} apperrors.ErrorResponse
+// @Failure 400 {object} errors.ErrorResponse
+// @Failure 409 {object} errors.ErrorResponse
+// @Failure 500 {object} errors.ErrorResponse
 // @Router /auth/register [post]
 func (h *AuthHandler) Register(c *gin.Context) {
 	var req dto.RegisterRequest
@@ -78,9 +78,9 @@ func (h *AuthHandler) Register(c *gin.Context) {
 // @Produce json
 // @Param request body dto.LoginRequest true "Login credentials"
 // @Success 200 {object} dto.AuthResponse
-// @Failure 400 {object} apperrors.ErrorResponse
-// @Failure 401 {object} apperrors.ErrorResponse
-// @Failure 500 {object} apperrors.ErrorResponse
+// @Failure 400 {object} errors.ErrorResponse
+// @Failure 401 {object} errors.ErrorResponse
+// @Failure 500 {object} errors.ErrorResponse
 // @Router /auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req dto.LoginRequest
@@ -124,9 +124,9 @@ func (h *AuthHandler) Login(c *gin.Context) {
 // @Produce json
 // @Param request body dto.PhoneLoginRequest true "Phone number"
 // @Success 200 {object} dto.OTPResponse
-// @Failure 400 {object} apperrors.ErrorResponse
-// @Failure 429 {object} apperrors.ErrorResponse
-// @Failure 500 {object} apperrors.ErrorResponse
+// @Failure 400 {object} errors.ErrorResponse
+// @Failure 429 {object} errors.ErrorResponse
+// @Failure 500 {object} errors.ErrorResponse
 // @Router /auth/login/phone [post]
 func (h *AuthHandler) SendPhoneOTP(c *gin.Context) {
 	var req dto.PhoneLoginRequest
@@ -169,8 +169,8 @@ func (h *AuthHandler) SendPhoneOTP(c *gin.Context) {
 // @Produce json
 // @Param request body dto.VerifyOTPRequest true "Phone and OTP code"
 // @Success 200 {object} dto.AuthResponse
-// @Failure 400 {object} apperrors.ErrorResponse
-// @Failure 500 {object} apperrors.ErrorResponse
+// @Failure 400 {object} errors.ErrorResponse
+// @Failure 500 {object} errors.ErrorResponse
 // @Router /auth/verify-otp [post]
 func (h *AuthHandler) VerifyPhoneOTP(c *gin.Context) {
 	var req dto.VerifyOTPRequest
@@ -214,9 +214,9 @@ func (h *AuthHandler) VerifyPhoneOTP(c *gin.Context) {
 // @Produce json
 // @Param request body dto.RefreshTokenRequest true "Refresh token"
 // @Success 200 {object} dto.AuthResponse
-// @Failure 400 {object} apperrors.ErrorResponse
-// @Failure 401 {object} apperrors.ErrorResponse
-// @Failure 500 {object} apperrors.ErrorResponse
+// @Failure 400 {object} errors.ErrorResponse
+// @Failure 401 {object} errors.ErrorResponse
+// @Failure 500 {object} errors.ErrorResponse
 // @Router /auth/refresh-token [post]
 func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	var req dto.RefreshTokenRequest
@@ -260,8 +260,8 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 // @Produce json
 // @Param request body dto.ForgotPasswordRequest true "Email address"
 // @Success 200 {object} dto.MessageResponse
-// @Failure 400 {object} apperrors.ErrorResponse
-// @Failure 500 {object} apperrors.ErrorResponse
+// @Failure 400 {object} errors.ErrorResponse
+// @Failure 500 {object} errors.ErrorResponse
 // @Router /auth/forgot-password [post]
 func (h *AuthHandler) ForgotPassword(c *gin.Context) {
 	var req dto.ForgotPasswordRequest
@@ -304,8 +304,8 @@ func (h *AuthHandler) ForgotPassword(c *gin.Context) {
 // @Produce json
 // @Param request body dto.ResetPasswordRequest true "Reset token and new password"
 // @Success 200 {object} dto.MessageResponse
-// @Failure 400 {object} apperrors.ErrorResponse
-// @Failure 500 {object} apperrors.ErrorResponse
+// @Failure 400 {object} errors.ErrorResponse
+// @Failure 500 {object} errors.ErrorResponse
 // @Router /auth/reset-password [post]
 func (h *AuthHandler) ResetPassword(c *gin.Context) {
 	var req dto.ResetPasswordRequest
@@ -348,8 +348,8 @@ func (h *AuthHandler) ResetPassword(c *gin.Context) {
 // @Produce json
 // @Param token query string true "Verification token"
 // @Success 200 {object} dto.MessageResponse
-// @Failure 400 {object} apperrors.ErrorResponse
-// @Failure 500 {object} apperrors.ErrorResponse
+// @Failure 400 {object} errors.ErrorResponse
+// @Failure 500 {object} errors.ErrorResponse
 // @Router /auth/verify-email [get]
 func (h *AuthHandler) VerifyEmail(c *gin.Context) {
 	token := c.Query("token")
@@ -384,8 +384,8 @@ func (h *AuthHandler) VerifyEmail(c *gin.Context) {
 // @Produce json
 // @Security BearerAuth
 // @Success 200 {object} dto.MessageResponse
-// @Failure 401 {object} apperrors.ErrorResponse
-// @Failure 500 {object} apperrors.ErrorResponse
+// @Failure 401 {object} errors.ErrorResponse
+// @Failure 500 {object} errors.ErrorResponse
 // @Router /auth/logout [post]
 func (h *AuthHandler) Logout(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
